@@ -14,13 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      video_reports: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string | null
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_reports_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      videos: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_hidden: boolean
+          mime_type: string | null
+          size_bytes: number | null
+          storage_path: string
+          thumbnail_path: string | null
+          title: string
+          uploader_name: string | null
+          views: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_hidden?: boolean
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path: string
+          thumbnail_path?: string | null
+          title: string
+          uploader_name?: string | null
+          views?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_hidden?: boolean
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path?: string
+          thumbnail_path?: string | null
+          title?: string
+          uploader_name?: string | null
+          views?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_video_views: { Args: { _video_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
