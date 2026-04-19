@@ -1,16 +1,100 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Header } from "@/components/Header";
+import { AgeGate } from "@/components/AgeGate";
+import { VideoCard, type VideoCardData } from "@/components/VideoCard";
+import { Loader2, Upload, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const [videos, setVideos] = useState<VideoCardData[] | null>(null);
+
+  useEffect(() => {
+    document.title = "FS Videos — Anonymous video sharing, 18+";
+    (async () => {
+      const { data } = await supabase
+        .from("videos")
+        .select("id,title,uploader_name,views,created_at,storage_path,thumbnail_path")
+        .eq("is_hidden", false)
+        .order("created_at", { ascending: false })
+        .limit(60);
+      setVideos((data as VideoCardData[]) ?? []);
+    })();
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background">
+      <AgeGate />
+      <Header />
+
+      <main>
+        <section className="relative overflow-hidden border-b border-border/60">
+          <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+          <div className="container relative py-14 md:py-20">
+            <div className="max-w-3xl">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                <Sparkles className="h-3.5 w-3.5" /> No account · No limits · 18+
+              </span>
+              <h1 className="mt-4 font-display text-5xl md:text-7xl tracking-wider leading-[0.95]">
+                Drop a video.
+                <br />
+                <span className="text-gradient">Stay anonymous.</span>
+              </h1>
+              <p className="mt-5 max-w-xl text-lg text-muted-foreground">
+                FS Videos is a no-signup video host. Upload up to 500&nbsp;MB,
+                add a title, and share the link. That's it.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Button asChild variant="hero" size="lg" className="gap-2">
+                  <Link to="/upload">
+                    <Upload className="h-5 w-5" />
+                    Upload a video
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <a href="#discover">Browse videos</a>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="discover" className="container py-10 md:py-14">
+          <div className="flex items-end justify-between mb-6">
+            <h2 className="font-display text-3xl tracking-wider">Latest uploads</h2>
+            <p className="text-sm text-muted-foreground">{videos?.length ?? 0} videos</p>
+          </div>
+
+          {videos === null ? (
+            <div className="grid place-items-center py-20 text-muted-foreground">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
+          ) : videos.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border p-12 text-center">
+              <p className="text-muted-foreground">No videos yet.</p>
+              <Button asChild variant="hero" className="mt-4">
+                <Link to="/upload">Be the first to upload</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {videos.map((v) => (
+                <VideoCard key={v.id} v={v} />
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
+
+      <footer className="border-t border-border/60 mt-10">
+        <div className="container py-8 text-sm text-muted-foreground flex flex-wrap items-center justify-between gap-3">
+          <p>© FS Videos · Adults only · Content uploaded by users</p>
+          <p className="text-xs">For takedown requests, use the report button on any video.</p>
+        </div>
+      </footer>
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
