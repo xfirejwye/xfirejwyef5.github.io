@@ -133,8 +133,7 @@ const Admin = () => {
             </div>
             <Button type="submit" variant="hero" className="w-full">Enter</Button>
             <p className="text-xs text-muted-foreground">
-              Default PIN is <code className="font-mono">{PIN}</code>. Change it in
-              <code className="font-mono"> src/pages/Admin.tsx</code>.
+             if ur not admin get off this page now nigga
             </p>
           </form>
         </main>
