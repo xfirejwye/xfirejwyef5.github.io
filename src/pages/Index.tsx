@@ -11,7 +11,7 @@ const Index = () => {
   const [videos, setVideos] = useState<VideoCardData[] | null>(null);
 
   useEffect(() => {
-    document.title = "FS Videos — Anonymous video sharing, 18+";
+    document.title = "F5 Videos — Anonymous video sharing, 18+";
     (async () => {
       const { data } = await supabase
         .from("videos")
@@ -42,7 +42,7 @@ const Index = () => {
                 <span className="text-gradient">Stay anonymous.</span>
               </h1>
               <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-                FS Videos is a no-signup video host. Upload up to 500&nbsp;MB,
+                F5 Videos is a no-signup video host. Upload up to 500&nbsp;MB,
                 add a title, and share the link. That's it.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
@@ -89,7 +89,7 @@ const Index = () => {
 
       <footer className="border-t border-border/60 mt-10">
         <div className="container py-8 text-sm text-muted-foreground flex flex-wrap items-center justify-between gap-3">
-          <p>© FS Videos · Adults only · Content uploaded by users</p>
+          <p>© F5 Videos · Adults only · Content uploaded by users</p>
           <p className="text-xs">For takedown requests, use the report button on any video.</p>
         </div>
       </footer>
