@@ -16,7 +16,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    document.title = "Sign in · FS Videos";
+    document.title = "Sign in · F5 Videos";
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate("/admin", { replace: true });
     });
