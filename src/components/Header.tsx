@@ -11,11 +11,11 @@ export const Header = () => {
         <Link to="/" className="flex items-center gap-2 group">
           <img
             src={logo}
-            alt="FS Videos"
+            alt="F5 Videos"
             className="h-9 w-9 object-contain transition-transform group-hover:scale-110"
           />
           <span className="font-display text-2xl tracking-widest leading-none">
-            FS<span className="text-primary">VIDEOS</span>
+            F5<span className="text-primary">VIDEOS</span>
           </span>
         </Link>
 

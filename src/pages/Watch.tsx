@@ -42,7 +42,7 @@ const Watch = () => {
         .maybeSingle();
       setVideo((data as Video) ?? null);
       if (data) {
-        document.title = `${data.title} · FS Videos`;
+        document.title = `${data.title} · F5 Videos`;
         await supabase.rpc("increment_video_views", { _video_id: id });
       }
       const { data: rel } = await supabase

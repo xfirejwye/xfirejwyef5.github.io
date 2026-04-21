@@ -27,7 +27,7 @@ const Admin = () => {
   const [items, setItems] = useState<ReportedVideo[]>([]);
 
   useEffect(() => {
-    document.title = "Admin · FS Videos";
+    document.title = "Admin · F5 Videos";
 
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) {
