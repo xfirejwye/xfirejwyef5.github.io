@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
-import { AgeGate } from "@/components/AgeGate";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -77,7 +76,6 @@ const Watch = () => {
   if (video === undefined) {
     return (
       <div className="min-h-screen bg-background">
-        <AgeGate />
         <Header />
         <div className="grid place-items-center py-32 text-muted-foreground">
           <Loader2 className="h-6 w-6 animate-spin" />
@@ -89,7 +87,6 @@ const Watch = () => {
   if (video === null) {
     return (
       <div className="min-h-screen bg-background">
-        <AgeGate />
         <Header />
         <div className="container py-20 text-center">
           <h1 className="font-display text-4xl tracking-wider">Video not found</h1>
@@ -106,7 +103,6 @@ const Watch = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <AgeGate />
       <Header />
       <main className="container py-6 md:py-10">
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">

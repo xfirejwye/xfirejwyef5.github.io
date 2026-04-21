@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
-import { AgeGate } from "@/components/AgeGate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
 import { UploadCloud, Film } from "lucide-react";
 import { formatBytes } from "@/lib/format";
+import { getClientFingerprint } from "@/lib/clientFingerprint";
 
 const MAX_BYTES = 500 * 1024 * 1024; // 500 MB
 
@@ -20,8 +20,10 @@ const Upload = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [uploaderName, setUploaderName] = useState("");
+  const [website, setWebsite] = useState(""); // honeypot
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [formMountedAt] = useState(() => Date.now());
 
   const onPickFile = (f: File | null) => {
     if (!f) return;
@@ -51,14 +53,47 @@ const Upload = () => {
       toast({ title: "Title is required", variant: "destructive" });
       return;
     }
+
+    // Honeypot — bots fill hidden fields
+    if (website.trim() !== "") {
+      toast({ title: "Upload blocked", variant: "destructive" });
+      return;
+    }
+    // Form submitted suspiciously fast (< 3 seconds)
+    if (Date.now() - formMountedAt < 3000) {
+      toast({ title: "Slow down", description: "Please take a moment to fill the form.", variant: "destructive" });
+      return;
+    }
+
     setUploading(true);
-    setProgress(5);
+    setProgress(3);
 
     try {
+      // Rate-limit check
+      const fp = await getClientFingerprint();
+      const { data: rl, error: rlErr } = await supabase.rpc("check_upload_rate_limit", { _ip_hash: fp });
+      if (rlErr) throw rlErr;
+      const result = rl as { allowed: boolean; reason?: string; limit?: number; wait_seconds?: number };
+      if (!result?.allowed) {
+        const messages: Record<string, string> = {
+          too_fast: `Please wait ${result.wait_seconds ?? 30}s between uploads.`,
+          hourly_limit: `Limit reached: max 3 uploads per hour.`,
+          daily_limit: `Limit reached: max 10 uploads per day.`,
+          invalid_client: `Could not verify your client.`,
+        };
+        toast({
+          title: "Upload limit reached",
+          description: messages[result.reason ?? ""] ?? "Try again later.",
+          variant: "destructive",
+        });
+        setUploading(false);
+        setProgress(0);
+        return;
+      }
+
       const ext = file.name.split(".").pop() || "mp4";
       const path = `uploads/${crypto.randomUUID()}.${ext}`;
 
-      // Fake progress while upload runs (supabase-js v2 doesn't expose progress)
       const progressTimer = setInterval(() => {
         setProgress((p) => (p < 90 ? p + 2 : p));
       }, 400);
@@ -103,7 +138,6 @@ const Upload = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <AgeGate />
       <Header />
       <main className="container max-w-2xl py-10 md:py-14">
         <h1 className="font-display text-4xl md:text-5xl tracking-wider">
@@ -188,6 +222,19 @@ const Upload = () => {
             </p>
           </div>
 
+          {/* Honeypot field — hidden from real users, bots fill it */}
+          <div aria-hidden="true" className="absolute left-[-9999px] top-[-9999px] h-0 w-0 overflow-hidden">
+            <label htmlFor="website">Website (leave blank)</label>
+            <input
+              id="website"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+            />
+          </div>
+
           {uploading && (
             <div className="space-y-2">
               <Progress value={progress} />
@@ -207,6 +254,10 @@ const Upload = () => {
             <UploadCloud className="h-5 w-5" />
             {uploading ? "Uploading…" : "Publish video"}
           </Button>
+
+          <p className="text-xs text-muted-foreground text-center">
+            Limits: 3 uploads/hour, 10/day per device.
+          </p>
         </form>
       </main>
     </div>

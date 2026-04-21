@@ -1,19 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Trash2, Lock, Loader2, ExternalLink } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Eye, EyeOff, Trash2, Loader2, ExternalLink, LogOut, ShieldAlert } from "lucide-react";
 import { formatRelativeTime } from "@/lib/format";
-
-const ADMIN_KEY = "fs-admin-pin";
-// NOTE: this is a soft client gate for a public hidden page; not a security boundary.
-// Real admin access lives in the database (only this page lets admins toggle/hide videos).
-// You can change the PIN here.
-const PIN = "fs-admin-2026";
 
 interface ReportedVideo {
   id: string;
@@ -27,22 +19,55 @@ interface ReportedVideo {
 }
 
 const Admin = () => {
-  const [authed, setAuthed] = useState(false);
-  const [pin, setPin] = useState("");
+  const navigate = useNavigate();
+  const [checking, setChecking] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<ReportedVideo[]>([]);
 
   useEffect(() => {
     document.title = "Admin · FS Videos";
-    if (sessionStorage.getItem(ADMIN_KEY) === PIN) setAuthed(true);
-  }, []);
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (!session) {
+        setIsAdmin(false);
+        setUserEmail(null);
+        navigate("/auth", { replace: true });
+      }
+    });
+
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/auth", { replace: true });
+        return;
+      }
+      setUserEmail(session.user.email ?? null);
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id);
+      const admin = (roles ?? []).some((r: any) => r.role === "admin");
+      setIsAdmin(admin);
+      setChecking(false);
+    })();
+
+    return () => sub.subscription.unsubscribe();
+  }, [navigate]);
 
   const load = async () => {
     setLoading(true);
-    const { data: reports } = await supabase
+    const { data: reports, error: repErr } = await supabase
       .from("video_reports")
       .select("video_id, reason, created_at")
       .order("created_at", { ascending: false });
+
+    if (repErr) {
+      toast({ title: "Could not load reports", description: repErr.message, variant: "destructive" });
+      setLoading(false);
+      return;
+    }
 
     const grouped = new Map<string, { count: number; latestReason: string | null }>();
     (reports ?? []).forEach((r: any) => {
@@ -57,10 +82,16 @@ const Admin = () => {
       setLoading(false);
       return;
     }
-    const { data: vids } = await supabase
+    const { data: vids, error: vErr } = await supabase
       .from("videos")
       .select("id,title,uploader_name,is_hidden,created_at,storage_path")
       .in("id", ids);
+
+    if (vErr) {
+      toast({ title: "Could not load videos", description: vErr.message, variant: "destructive" });
+      setLoading(false);
+      return;
+    }
 
     const merged: ReportedVideo[] = (vids ?? []).map((v: any) => ({
       ...v,
@@ -73,17 +104,12 @@ const Admin = () => {
   };
 
   useEffect(() => {
-    if (authed) load();
-  }, [authed]);
+    if (isAdmin) load();
+  }, [isAdmin]);
 
-  const tryLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pin === PIN) {
-      sessionStorage.setItem(ADMIN_KEY, PIN);
-      setAuthed(true);
-    } else {
-      toast({ title: "Wrong PIN", variant: "destructive" });
-    }
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth", { replace: true });
   };
 
   const toggleHide = async (v: ReportedVideo) => {
@@ -111,31 +137,32 @@ const Admin = () => {
     load();
   };
 
-  if (!authed) {
+  if (checking) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="container max-w-sm py-20">
-          <form onSubmit={tryLogin} className="space-y-4 rounded-2xl border border-border p-6 shadow-card">
-            <div className="flex items-center gap-2">
-              <Lock className="h-5 w-5 text-primary" />
-              <h1 className="font-display text-2xl tracking-wider">Admin</h1>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="pin">Admin PIN</Label>
-              <Input
-                id="pin"
-                type="password"
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                placeholder="••••••••"
-              />
-            </div>
-            <Button type="submit" variant="hero" className="w-full">Enter</Button>
-            <p className="text-xs text-muted-foreground">
-             if ur not admin get off this page now nigga
-            </p>
-          </form>
+        <div className="grid place-items-center py-32 text-muted-foreground">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container max-w-md py-20 text-center">
+          <ShieldAlert className="mx-auto h-12 w-12 text-destructive" />
+          <h1 className="mt-4 font-display text-3xl tracking-wider">Not an admin</h1>
+          <p className="mt-2 text-muted-foreground">
+            You're signed in as <span className="text-foreground">{userEmail}</span>, but this account
+            doesn't have admin access. Ask the project owner to grant you the admin role.
+          </p>
+          <div className="mt-6 flex justify-center gap-2">
+            <Button variant="outline" onClick={signOut}>Sign out</Button>
+            <Button asChild variant="hero"><Link to="/">Back home</Link></Button>
+          </div>
         </main>
       </div>
     );
@@ -146,10 +173,18 @@ const Admin = () => {
       <Header />
       <main className="container py-10">
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <h1 className="font-display text-4xl tracking-wider">Reported videos</h1>
-          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh"}
-          </Button>
+          <div>
+            <h1 className="font-display text-4xl tracking-wider">Reported videos</h1>
+            <p className="text-sm text-muted-foreground mt-1">Signed in as {userEmail}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh"}
+            </Button>
+            <Button variant="ghost" size="sm" className="gap-1.5" onClick={signOut}>
+              <LogOut className="h-4 w-4" /> Sign out
+            </Button>
+          </div>
         </div>
 
         {loading && items.length === 0 ? (
