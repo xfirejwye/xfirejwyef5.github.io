@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { Upload, Flame } from "lucide-react";
+import { Upload, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import logo from "@/assets/logo.png";
@@ -29,7 +29,7 @@ export const Header = () => {
               }`
             }
           >
-            <span className="inline-flex items-center gap-1.5"><Flame className="h-4 w-4" /> Discover</span>
+            <span className="inline-flex items-center gap-1.5"><Home className="h-4 w-4" /> Home</span>
           </NavLink>
         </nav>
 
