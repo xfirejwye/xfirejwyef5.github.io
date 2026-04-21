@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
-import { AgeGate } from "@/components/AgeGate";
 import { VideoCard, type VideoCardData } from "@/components/VideoCard";
 import { Loader2, Upload, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ const Index = () => {
   const [videos, setVideos] = useState<VideoCardData[] | null>(null);
 
   useEffect(() => {
-    document.title = "F5 Videos — Anonymous video sharing, 18+";
+    document.title = "FS Videos — Anonymous video sharing";
     (async () => {
       const { data } = await supabase
         .from("videos")
@@ -25,7 +24,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <AgeGate />
       <Header />
 
       <main>
@@ -34,7 +32,7 @@ const Index = () => {
           <div className="container relative py-14 md:py-20">
             <div className="max-w-3xl">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                <Sparkles className="h-3.5 w-3.5" /> No account · No limits · 18+
+                <Sparkles className="h-3.5 w-3.5" /> No account · No limits
               </span>
               <h1 className="mt-4 font-display text-5xl md:text-7xl tracking-wider leading-[0.95]">
                 Drop a video.
@@ -42,7 +40,7 @@ const Index = () => {
                 <span className="text-gradient">Stay anonymous.</span>
               </h1>
               <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-                F5 Videos is a no-signup video host. Upload up to 500&nbsp;MB,
+                FS Videos is a no-signup video host. Upload up to 500&nbsp;MB,
                 add a title, and share the link. That's it.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
@@ -89,7 +87,7 @@ const Index = () => {
 
       <footer className="border-t border-border/60 mt-10">
         <div className="container py-8 text-sm text-muted-foreground flex flex-wrap items-center justify-between gap-3">
-          <p>© F5 Videos · Adults only · Content uploaded by users</p>
+          <p>© FS Videos · Content uploaded by users</p>
           <p className="text-xs">For takedown requests, use the report button on any video.</p>
         </div>
       </footer>
