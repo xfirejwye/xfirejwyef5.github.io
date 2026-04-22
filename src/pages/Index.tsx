@@ -132,7 +132,7 @@ const Index = () => {
   <div className="container py-8 text-sm text-muted-foreground flex flex-wrap items-center justify-between gap-3">
     <div>
       <p>© F5 Videos · Content uploaded by users</p>
-      <p className="text-xs mt-1">Made by xfirejwye</p>
+      <p className="text-xs mt-1">Made by xfirejwye the goat</p>
     </div>
     <p className="text-xs">For takedown requests, use the report button on any video.</p>
   </div>
