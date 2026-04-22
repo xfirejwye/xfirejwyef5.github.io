@@ -22,18 +22,22 @@ const Index = () => {
         .eq("is_hidden", false)
         .order("created_at", { ascending: false })
         .limit(60);
+
       setVideos((data as VideoRow[]) ?? []);
     })();
   }, []);
 
   const filtered = useMemo(() => {
     if (!videos) return null;
+
     const q = query.trim().toLowerCase();
     if (!q) return videos;
+
     return videos.filter((v) => {
       const title = v.title?.toLowerCase() ?? "";
       const desc = (v.description ?? "").toLowerCase();
       const user = (v.uploader_name ?? "").toLowerCase();
+
       return title.includes(q) || desc.includes(q) || user.includes(q);
     });
   }, [videos, query]);
@@ -45,20 +49,25 @@ const Index = () => {
       <main>
         <section className="relative overflow-hidden border-b border-border/60">
           <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+
           <div className="container relative py-14 md:py-20">
             <div className="max-w-3xl">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                <Sparkles className="h-3.5 w-3.5" /> No account · No limits
+                <Sparkles className="h-3.5 w-3.5" />
+                No account · No limits
               </span>
+
               <h1 className="mt-4 font-display text-5xl md:text-7xl tracking-wider leading-[0.95]">
                 Drop a video.
                 <br />
                 <span className="text-gradient">Stay anonymous.</span>
               </h1>
+
               <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-                F5 Videos is a no-signup video host. Upload up to 500&nbsp;MB,
-                add a title, and share the link. That's it.
+                F5 Videos is a no-signup video host. Upload up to 500 MB,
+                add a title, and share the link. That&apos;s it.
               </p>
+
               <div className="mt-7 flex flex-wrap gap-3">
                 <Button asChild variant="hero" size="lg" className="gap-2">
                   <Link to="/upload">
@@ -66,6 +75,7 @@ const Index = () => {
                     Upload a video
                   </Link>
                 </Button>
+
                 <Button asChild variant="outline" size="lg">
                   <a href="#discover">Browse videos</a>
                 </Button>
@@ -76,9 +86,13 @@ const Index = () => {
 
         <section id="discover" className="container py-10 md:py-14">
           <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
-            <h2 className="font-display text-3xl tracking-wider">Latest uploads</h2>
+            <h2 className="font-display text-3xl tracking-wider">
+              Latest uploads
+            </h2>
+
             <div className="relative w-full sm:w-80">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+
               <Input
                 type="search"
                 placeholder="Search title, description or user…"
@@ -86,6 +100,7 @@ const Index = () => {
                 onChange={(e) => setQuery(e.target.value)}
                 className="pl-9 pr-9"
               />
+
               {query && (
                 <button
                   type="button"
@@ -97,6 +112,7 @@ const Index = () => {
                 </button>
               )}
             </div>
+
             <p className="text-sm text-muted-foreground w-full sm:w-auto sm:ml-auto">
               {filtered?.length ?? 0} {query ? "match" : "video"}
               {(filtered?.length ?? 0) === 1 ? "" : "es"}
@@ -110,8 +126,11 @@ const Index = () => {
           ) : filtered.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border p-12 text-center">
               <p className="text-muted-foreground">
-                {query ? `No videos match "${query}".` : "No videos yet."}
+                {query
+                  ? `No videos match "${query}".`
+                  : "No videos yet."}
               </p>
+
               {!query && (
                 <Button asChild variant="hero" className="mt-4">
                   <Link to="/upload">Be the first to upload</Link>
@@ -132,6 +151,7 @@ const Index = () => {
         <div className="container py-8 text-sm text-muted-foreground flex flex-wrap items-center justify-between gap-3">
           <div>
             <p>© F5 Videos · Content uploaded by users</p>
+
             <p className="text-xs mt-1">
               Made by{" "}
               <a
@@ -145,12 +165,13 @@ const Index = () => {
               the goat
             </p>
           </div>
+
           <p className="text-xs">
             For takedown requests, use the report button on any video.
           </p>
         </div>
       </footer>
-    </div>  {/*  FIXED: this was missing */}
+    </div>
   );
 };
 
