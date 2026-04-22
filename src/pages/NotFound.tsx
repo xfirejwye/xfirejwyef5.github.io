@@ -16,12 +16,16 @@ const NotFound = () => {
       <div className="w-full max-w-md rounded-2xl border p-10 text-center" style={{ background: "#1a1a1a", borderColor: "#2e2e2e" }}>
 
         {/* Icon */}
-        <div className="mx-auto mb-6 flex items-center justify-center rounded-full" style={{ border: "1.5px solid #ef4444", width: 52, height: 52 }}>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M5 5L15 15M15 5L5 15" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-        </div>
-
+       <div
+  className="mx-auto mb-6 flex items-center justify-center rounded-full"
+  style={{ border: "1.5px solid #ef4444", width: 52, height: 52 }}
+>
+  <img
+    src="/favicon.png"
+    alt="icon"
+    style={{ width: 20, height: 20, objectFit: "contain" }}
+  />
+</div>
         {/* Badge */}
         <span className="mb-4 inline-block rounded-md px-2.5 py-1 text-xs font-medium uppercase tracking-wide" style={{ color: "#ef4444", background: "rgba(239,68,68,0.12)", border: "0.5px solid rgba(239,68,68,0.3)" }}>
           Error 404
