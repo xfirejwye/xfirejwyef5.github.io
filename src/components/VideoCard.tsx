@@ -36,7 +36,7 @@ export const VideoCard = ({ v }: { v: VideoCardData }) => {
 
   return (
     <Link
-      to={`/v/${v.id}`}
+      to={`/watch/${v.id}`}
       className="group block animate-fade-in"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

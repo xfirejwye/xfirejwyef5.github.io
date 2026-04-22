@@ -224,7 +224,7 @@ const Admin = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Button asChild variant="ghost" size="sm" className="gap-1.5">
-                    <Link to={`/v/${v.id}`} target="_blank">
+                    <Link to={`/watch/${v.id}`} target="_blank">
                       <ExternalLink className="h-4 w-4" /> Open
                     </Link>
                   </Button>
