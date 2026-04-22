@@ -150,7 +150,7 @@ const Index = () => {
           </p>
         </div>
       </footer>
-    </div>  {/* ✅ FIXED: this was missing */}
+    </div>  {/*  FIXED: this was missing */}
   );
 };
 
