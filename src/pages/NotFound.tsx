@@ -20,7 +20,7 @@ const NotFound = () => {
   <img
     src="/favicon.png"
     alt="icon"
-    style={{ width: 52, height: 52, objectFit: "contain" }}
+    style={{ width: 65, height: 65, objectFit: "contain" }}
   />
 </div>
         {/* Badge */}
