@@ -128,28 +128,29 @@ const Index = () => {
         </section>
       </main>
 
-    <footer className="border-t border-border/60 mt-10">
-  <div className="container py-8 text-sm text-muted-foreground flex flex-wrap items-center justify-between gap-3">
-    <div>
-      <p>© F5 Videos · Content uploaded by users</p>
-      <p className="text-xs mt-1">
-        Made by{" "}
-        <a
-          href="https://discord.com/users/1116706267390550089"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent font-semibold hover:opacity-80 transition"
-        >
-          xfirejwye
-        </a>{" "}
-        the goat
-      </p>
-    </div>
-    <p className="text-xs">
-      For takedown requests, use the report button on any video.
-    </p>
-  </div>
-</footer>
+      <footer className="border-t border-border/60 mt-10">
+        <div className="container py-8 text-sm text-muted-foreground flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p>© F5 Videos · Content uploaded by users</p>
+            <p className="text-xs mt-1">
+              Made by{" "}
+              <a
+                href="https://discord.com/users/1116706267390550089"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent font-semibold hover:opacity-80 transition"
+              >
+                xfirejwye
+              </a>{" "}
+              the goat
+            </p>
+          </div>
+          <p className="text-xs">
+            For takedown requests, use the report button on any video.
+          </p>
+        </div>
+      </footer>
+    </div>  {/* ✅ FIXED: this was missing */}
   );
 };
 
