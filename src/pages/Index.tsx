@@ -1,26 +1,42 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { VideoCard, type VideoCardData } from "@/components/VideoCard";
-import { Loader2, Upload, Sparkles } from "lucide-react";
+import { Loader2, Upload, Sparkles, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 
+type VideoRow = VideoCardData & { description?: string | null };
+
 const Index = () => {
-  const [videos, setVideos] = useState<VideoCardData[] | null>(null);
+  const [videos, setVideos] = useState<VideoRow[] | null>(null);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     document.title = "F5 Videos — Anonymous video sharing";
     (async () => {
       const { data } = await supabase
         .from("videos")
-        .select("id,title,uploader_name,views,created_at,storage_path,thumbnail_path")
+        .select("id,title,description,uploader_name,views,created_at,storage_path,thumbnail_path")
         .eq("is_hidden", false)
         .order("created_at", { ascending: false })
         .limit(60);
-      setVideos((data as VideoCardData[]) ?? []);
+      setVideos((data as VideoRow[]) ?? []);
     })();
   }, []);
+
+  const filtered = useMemo(() => {
+    if (!videos) return null;
+    const q = query.trim().toLowerCase();
+    if (!q) return videos;
+    return videos.filter((v) => {
+      const title = v.title?.toLowerCase() ?? "";
+      const desc = (v.description ?? "").toLowerCase();
+      const user = (v.uploader_name ?? "").toLowerCase();
+      return title.includes(q) || desc.includes(q) || user.includes(q);
+    });
+  }, [videos, query]);
 
   return (
     <div className="min-h-screen bg-background">
