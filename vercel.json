@@ -1,5 +1,16 @@
 {
   "rewrites": [
+    {
+      "source": "/watch/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|Twitterbot|Discordbot|Slackbot|LinkedInBot|TelegramBot|WhatsApp|Pinterest|redditbot|Embedly|vkShare|W3C_Validator|Googlebot|bingbot|DuckDuckBot|Applebot|Bytespider|ia_archiver|SkypeUriPreview|iMessagePreview).*"
+        }
+      ],
+      "destination": "https://mrhozmwuyelphqiywdng.supabase.co/functions/v1/og-watch?id=:id&origin=https://clips.forbidden5.lol"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

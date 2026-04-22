@@ -123,7 +123,7 @@ const Upload = () => {
 
       setProgress(100);
       toast({ title: "Uploaded!", description: "Your video is live." });
-      navigate(`/v/${row!.id}`);
+      navigate(`/watch/${row!.id}`);
     } catch (err: any) {
       console.error(err);
       toast({
