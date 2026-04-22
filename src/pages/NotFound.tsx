@@ -16,19 +16,19 @@ const NotFound = () => {
       <div className="w-full max-w-md rounded-2xl border p-10 text-center" style={{ background: "#1a1a1a", borderColor: "#2e2e2e" }}>
 
         {/* Icon */}
-        <div className="mx-auto mb-6 flex h-13 w-13 items-center justify-center rounded-full" style={{ border: "1.5px solid #f97316", width: 52, height: 52 }}>
+        <div className="mx-auto mb-6 flex items-center justify-center rounded-full" style={{ border: "1.5px solid #ef4444", width: 52, height: 52 }}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M5 5L15 15M15 5L5 15" stroke="#f97316" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M5 5L15 15M15 5L5 15" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </div>
 
         {/* Badge */}
-        <span className="mb-4 inline-block rounded-md px-2.5 py-1 text-xs font-medium uppercase tracking-wide" style={{ color: "#f97316", background: "rgba(249,115,22,0.12)", border: "0.5px solid rgba(249,115,22,0.3)" }}>
+        <span className="mb-4 inline-block rounded-md px-2.5 py-1 text-xs font-medium uppercase tracking-wide" style={{ color: "#ef4444", background: "rgba(239,68,68,0.12)", border: "0.5px solid rgba(239,68,68,0.3)" }}>
           Error 404
         </span>
 
         {/* Heading */}
-        <h1 className="mb-1 font-medium leading-none" style={{ fontSize: 80, letterSpacing: -2, color: "#f97316" }}>404</h1>
+        <h1 className="mb-1 font-medium leading-none" style={{ fontSize: 80, letterSpacing: -2, color: "#ef4444" }}>404</h1>
         <p className="mb-2 text-lg font-medium" style={{ color: "#f5f5f5" }}>Page not found</p>
         <p className="mb-4 text-sm" style={{ color: "#888" }}>
           The page you're looking for doesn't exist or may have been moved.
@@ -43,7 +43,7 @@ const NotFound = () => {
 
         {/* Actions */}
         <div className="flex flex-wrap justify-center gap-2.5">
-          <a href="/" className="rounded-lg px-6 py-2.5 text-sm font-medium transition-opacity hover:opacity-85" style={{ background: "#f97316", color: "#0f0f0f" }}>
+          <a href="/" className="rounded-lg px-6 py-2.5 text-sm font-medium transition-opacity hover:opacity-85" style={{ background: "#ef4444", color: "#fff" }}>
             Go home
           </a>
           <button onClick={() => history.back()} className="rounded-lg px-6 py-2.5 text-sm transition-colors" style={{ background: "transparent", color: "#888", border: "0.5px solid #2e2e2e" }}>
