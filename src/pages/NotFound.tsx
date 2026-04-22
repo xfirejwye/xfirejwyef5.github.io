@@ -20,17 +20,17 @@ const NotFound = () => {
   <img
     src="/favicon.png"
     alt="icon"
-    style={{ width: 65, height: 65, objectFit: "contain" }}
+    style={{ width: 75, height: 75, objectFit: "contain" }}
   />
 </div>
         {/* Badge */}
-        <span className="mb-4 inline-block rounded-md px-2.5 py-1 text-xs font-medium uppercase tracking-wide" style={{ color: "#ef4444", background: "rgba(239,68,68,0.12)", border: "0.5px solid rgba(239,68,68,0.3)" }}>
+        <span className="mb-4 inline-block rounded-md px-2.5 py-1 text-xs font-medium uppercase tracking-wide" style={{ color: "##9f0000", background: "rgba(239,68,68,0.12)", border: "0.5px solid rgba(239,68,68,0.3)" }}>
           Error 404
         </span>
 
         {/* Heading */}
-        <h1 className="mb-1 font-medium leading-none" style={{ fontSize: 80, letterSpacing: -2, color: "#ef4444" }}>404</h1>
-        <p className="mb-2 text-lg font-medium" style={{ color: "#f5f5f5" }}>Page not found</p>
+        <h1 className="mb-1 font-medium leading-none" style={{ fontSize: 80, letterSpacing: -2, color: "#9f0000" }}>404</h1>
+        <p className="mb-2 text-lg font-medium" style={{ color: "#9f0000" }}>Page not found</p>
         <p className="mb-4 text-sm" style={{ color: "#888" }}>
           The page you're looking for doesn't exist or may have been moved.
         </p>
