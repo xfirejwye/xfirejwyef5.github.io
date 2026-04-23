@@ -17,6 +17,7 @@ import { toast } from "@/hooks/use-toast";
 import { Eye, Flag, Loader2, User } from "lucide-react";
 import { formatRelativeTime, formatViews } from "@/lib/format";
 import { VideoCard, type VideoCardData } from "@/components/VideoCard";
+import { Comments } from "@/components/Comments";
 
 interface Video extends VideoCardData {
   description: string | null;
@@ -172,6 +173,8 @@ const Watch = () => {
                 {video.description}
               </div>
             )}
+
+            <Comments videoId={video.id} />
           </div>
 
           <aside>
