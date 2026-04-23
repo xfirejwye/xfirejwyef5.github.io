@@ -96,10 +96,13 @@ export const BlacklistTab = ({
   };
 
   const toggle = async (entry: BlacklistEntry, field: "block_uploads" | "block_comments" | "block_viewing") => {
-    const { error } = await supabase
-      .from("ip_blacklist")
-      .update({ [field]: !entry[field] })
-      .eq("id", entry.id);
+    const update =
+      field === "block_uploads"
+        ? { block_uploads: !entry.block_uploads }
+        : field === "block_comments"
+          ? { block_comments: !entry.block_comments }
+          : { block_viewing: !entry.block_viewing };
+    const { error } = await supabase.from("ip_blacklist").update(update).eq("id", entry.id);
     if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" });
     load();
   };
