@@ -59,21 +59,30 @@ Deno.serve(async (req) => {
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}" />
 <link rel="canonical" href="${esc(canonical)}" />
+<meta name="theme-color" content="#a70404" />
+
 <meta property="og:type" content="video.other" />
 <meta property="og:site_name" content="F5 Videos" />
 <meta property="og:url" content="${esc(canonical)}" />
 <meta property="og:title" content="${esc(title)}" />
 <meta property="og:description" content="${esc(description)}" />
+
 <meta property="og:image" content="${esc(imageUrl)}" />
 <meta property="og:image:secure_url" content="${esc(imageUrl)}" />
+<meta property="og:image:type" content="image/jpeg" />
 <meta property="og:image:width" content="1280" />
 <meta property="og:image:height" content="720" />
+<meta property="og:image:alt" content="${esc(title)}" />
+
 ${videoUrl ? `<meta property="og:video" content="${esc(videoUrl)}" />
+<meta property="og:video:url" content="${esc(videoUrl)}" />
 <meta property="og:video:secure_url" content="${esc(videoUrl)}" />
 <meta property="og:video:type" content="${esc(mime)}" />
 <meta property="og:video:width" content="1280" />
 <meta property="og:video:height" content="720" />` : ""}
+
 <meta name="twitter:card" content="player" />
+<meta name="twitter:site" content="@f5videos" />
 <meta name="twitter:title" content="${esc(title)}" />
 <meta name="twitter:description" content="${esc(description)}" />
 <meta name="twitter:image" content="${esc(imageUrl)}" />
@@ -82,6 +91,20 @@ ${videoUrl ? `<meta name="twitter:player" content="${esc(canonical)}" />
 <meta name="twitter:player:height" content="720" />
 <meta name="twitter:player:stream" content="${esc(videoUrl)}" />
 <meta name="twitter:player:stream:content_type" content="${esc(mime)}" />` : ""}
+
+<script type="application/ld+json">
+${JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  name: title,
+  description,
+  thumbnailUrl: [imageUrl],
+  uploadDate: new Date().toISOString(),
+  contentUrl: videoUrl,
+  embedUrl: canonical,
+})}
+</script>
+
 <meta http-equiv="refresh" content="0; url=${esc(canonical)}" />
 </head>
 <body>
