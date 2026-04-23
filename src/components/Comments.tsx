@@ -93,14 +93,16 @@ export const Comments = ({ videoId }: { videoId: string }) => {
     }
     const author = (name.trim() || "Anonymous").slice(0, 40);
     setSubmitting(true);
-    const { error } = await supabase.from("video_comments").insert({
-      video_id: videoId,
-      author_name: author,
-      body: text,
+    const { data, error } = await supabase.functions.invoke("post-comment", {
+      body: { video_id: videoId, author_name: author, body: text },
     });
     setSubmitting(false);
-    if (error) {
-      toast({ title: "Could not post", description: error.message, variant: "destructive" });
+    if (error || (data as any)?.error) {
+      toast({
+        title: "Could not post",
+        description: (data as any)?.error ?? error?.message ?? "Unknown error",
+        variant: "destructive",
+      });
       return;
     }
     localStorage.setItem(NAME_KEY, author);

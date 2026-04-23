@@ -107,23 +107,26 @@ const Upload = () => {
       if (upErr) throw upErr;
       setProgress(95);
 
-      const { data: row, error: insErr } = await supabase
-        .from("videos")
-        .insert({
+      const { data: regData, error: regErr } = await supabase.functions.invoke("register-video", {
+        body: {
           title: title.trim().slice(0, 200),
           description: description.trim().slice(0, 5000) || null,
           uploader_name: uploaderName.trim().slice(0, 60) || null,
           storage_path: path,
           mime_type: file.type,
           size_bytes: file.size,
-        })
-        .select("id")
-        .single();
-      if (insErr) throw insErr;
+        },
+      });
+      if (regErr || (regData as any)?.error) {
+        // Clean up the uploaded file if registration failed
+        await supabase.storage.from("videos").remove([path]);
+        throw new Error((regData as any)?.error ?? regErr?.message ?? "Registration failed");
+      }
+      const newId = (regData as any).id as string;
 
       setProgress(100);
       toast({ title: "Uploaded!", description: "Your video is live." });
-      navigate(`/watch/${row!.id}`);
+      navigate(`/watch/${newId}`);
     } catch (err: any) {
       console.error(err);
       toast({

@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      ip_blacklist: {
+        Row: {
+          block_comments: boolean
+          block_uploads: boolean
+          block_viewing: boolean
+          created_at: string
+          id: string
+          ip: unknown
+          note: string | null
+        }
+        Insert: {
+          block_comments?: boolean
+          block_uploads?: boolean
+          block_viewing?: boolean
+          created_at?: string
+          id?: string
+          ip: unknown
+          note?: string | null
+        }
+        Update: {
+          block_comments?: boolean
+          block_uploads?: boolean
+          block_viewing?: boolean
+          created_at?: string
+          id?: string
+          ip?: unknown
+          note?: string | null
+        }
+        Relationships: []
+      }
       upload_attempts: {
         Row: {
           created_at: string
@@ -62,6 +92,7 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          ip_address: unknown
           video_id: string
         }
         Insert: {
@@ -69,6 +100,7 @@ export type Database = {
           body: string
           created_at?: string
           id?: string
+          ip_address?: unknown
           video_id: string
         }
         Update: {
@@ -76,6 +108,7 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+          ip_address?: unknown
           video_id?: string
         }
         Relationships: [
@@ -84,6 +117,13 @@ export type Database = {
             columns: ["video_id"]
             isOneToOne: false
             referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_comments_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos_admin"
             referencedColumns: ["id"]
           },
         ]
@@ -115,6 +155,13 @@ export type Database = {
             referencedRelation: "videos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "video_reports_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos_admin"
+            referencedColumns: ["id"]
+          },
         ]
       }
       videos: {
@@ -122,6 +169,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          ip_address: unknown
           is_hidden: boolean
           mime_type: string | null
           size_bytes: number | null
@@ -135,6 +183,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          ip_address?: unknown
           is_hidden?: boolean
           mime_type?: string | null
           size_bytes?: number | null
@@ -148,6 +197,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          ip_address?: unknown
           is_hidden?: boolean
           mime_type?: string | null
           size_bytes?: number | null
@@ -161,7 +211,99 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      comments_admin: {
+        Row: {
+          author_name: string | null
+          body: string | null
+          created_at: string | null
+          id: string | null
+          ip_address: unknown
+          ip_text: string | null
+          video_id: string | null
+        }
+        Insert: {
+          author_name?: string | null
+          body?: string | null
+          created_at?: string | null
+          id?: string | null
+          ip_address?: unknown
+          ip_text?: never
+          video_id?: string | null
+        }
+        Update: {
+          author_name?: string | null
+          body?: string | null
+          created_at?: string | null
+          id?: string | null
+          ip_address?: unknown
+          ip_text?: never
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_comments_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_comments_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      videos_admin: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string | null
+          ip_address: unknown
+          ip_text: string | null
+          is_hidden: boolean | null
+          mime_type: string | null
+          size_bytes: number | null
+          storage_path: string | null
+          thumbnail_path: string | null
+          title: string | null
+          uploader_name: string | null
+          views: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          ip_address?: unknown
+          ip_text?: never
+          is_hidden?: boolean | null
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path?: string | null
+          thumbnail_path?: string | null
+          title?: string | null
+          uploader_name?: string | null
+          views?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          ip_address?: unknown
+          ip_text?: never
+          is_hidden?: boolean | null
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path?: string | null
+          thumbnail_path?: string | null
+          title?: string | null
+          uploader_name?: string | null
+          views?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_upload_rate_limit: { Args: { _ip_hash: string }; Returns: Json }
@@ -173,6 +315,7 @@ export type Database = {
         Returns: boolean
       }
       increment_video_views: { Args: { _video_id: string }; Returns: undefined }
+      is_ip_blocked: { Args: { _ip: unknown; _kind: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"

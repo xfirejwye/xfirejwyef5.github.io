@@ -2,3 +2,9 @@ project_id = "mrhozmwuyelphqiywdng"
 
 [functions.og-watch]
 verify_jwt = false
+
+[functions.post-comment]
+verify_jwt = false
+
+[functions.register-video]
+verify_jwt = false
