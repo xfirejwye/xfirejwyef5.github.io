@@ -51,11 +51,9 @@ const Reels = () => {
   const [paused, setPaused] = useState(false);
   const [commentsOpenFor, setCommentsOpenFor] = useState<string | null>(null);
 
-  // Load shorts
   useEffect(() => {
     document.title = "Reels · F5 Videos";
     (async () => {
-      // Include anything explicitly marked as a short OR any video with a known duration <= 60s
       const { data, error } = await supabase
         .from("videos")
         .select("id,title,description,uploader_name,views,created_at,storage_path,duration_seconds")
@@ -72,7 +70,6 @@ const Reels = () => {
     })();
   }, []);
 
-  // Scroll to a specific reel if ?id is in route
   useEffect(() => {
     if (!reels || reels.length === 0) return;
     const target = routeId && reels.find((r) => r.id === routeId) ? routeId : reels[0].id;
@@ -82,7 +79,6 @@ const Reels = () => {
     });
   }, [reels, routeId]);
 
-  // Observe which reel is in view
   useEffect(() => {
     if (!reels || reels.length === 0) return;
     const root = containerRef.current;
@@ -94,7 +90,10 @@ const Reels = () => {
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (visible) {
           const id = (visible.target as HTMLElement).dataset.id;
-          if (id) setActiveId(id);
+          if (id) {
+            setActiveId(id);
+            setPaused(false);
+          }
         }
       },
       { root, threshold: [0.5, 0.75, 0.9] },
@@ -103,12 +102,15 @@ const Reels = () => {
     return () => io.disconnect();
   }, [reels]);
 
-  // Play active, pause others; count a view once per reel per session
   useEffect(() => {
     videoRefs.current.forEach((v, id) => {
       if (id === activeId) {
         v.muted = muted;
-        if (!paused) v.play().catch(() => {});
+        if (!paused) {
+          v.play().catch(() => {});
+        } else {
+          v.pause();
+        }
       } else {
         v.pause();
         v.currentTime = 0;
@@ -132,6 +134,22 @@ const Reels = () => {
     if (next) itemRefs.current.get(next.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const handleVideoClick = (id: string) => {
+    if (id !== activeId) return;
+    setPaused((p) => {
+      const next = !p;
+      const video = videoRefs.current.get(id);
+      if (video) {
+        if (next) {
+          video.pause();
+        } else {
+          video.play().catch(() => {});
+        }
+      }
+      return next;
+    });
+  };
+
   const share = async (r: Reel) => {
     const url = `${window.location.origin}/reels/${r.id}`;
     try {
@@ -142,7 +160,6 @@ const Reels = () => {
         toast({ title: "Link copied", description: url });
       }
     } catch {
-      // user cancelled — ignore
     }
   };
 
@@ -187,6 +204,7 @@ const Reels = () => {
 
             {reels.map((r) => {
               const url = supabase.storage.from("videos").getPublicUrl(r.storage_path).data.publicUrl;
+              const isActive = activeId === r.id;
               return (
                 <section
                   key={r.id}
@@ -208,14 +226,13 @@ const Reels = () => {
                       playsInline
                       muted={muted}
                       preload="metadata"
-                      onClick={() => setPaused((p) => !p)}
+                      onClick={() => handleVideoClick(r.id)}
                       className="h-full w-full object-contain bg-black cursor-pointer"
                     />
 
-                    {/* Pause overlay */}
-                    {activeId === r.id && paused && (
+                    {isActive && paused && (
                       <button
-                        onClick={() => setPaused(false)}
+                        onClick={() => handleVideoClick(r.id)}
                         className="absolute inset-0 grid place-items-center bg-black/30"
                         aria-label="Play"
                       >
@@ -225,7 +242,15 @@ const Reels = () => {
                       </button>
                     )}
 
-                    {/* Bottom info gradient */}
+                    {isActive && !paused && (
+                      <button
+                        onClick={() => handleVideoClick(r.id)}
+                        className="absolute inset-0 grid place-items-center bg-transparent"
+                        aria-label="Pause"
+                        style={{ pointerEvents: "none" }}
+                      />
+                    )}
+
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pb-6">
                       <p className="text-white font-semibold text-sm">
                         @{r.uploader_name?.trim() || "anonymous"}
@@ -241,7 +266,6 @@ const Reels = () => {
                       </p>
                     </div>
 
-                    {/* Side actions */}
                     <div className="absolute right-2 md:right-3 bottom-24 flex flex-col items-center gap-5 text-white">
                       <button
                         onClick={() => setMuted((m) => !m)}
@@ -296,7 +320,6 @@ const Reels = () => {
               );
             })}
 
-            {/* Desktop up/down nav */}
             <div className="hidden md:flex flex-col gap-3 fixed right-6 top-1/2 -translate-y-1/2 z-30">
               <Button
                 size="icon"
