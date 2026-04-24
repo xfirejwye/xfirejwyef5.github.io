@@ -41,7 +41,7 @@ const Reels = () => {
   const { id: routeId } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
   const viewedRef = useRef<Set<string>>(new Set());
 
