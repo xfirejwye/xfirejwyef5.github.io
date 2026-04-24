@@ -91,6 +91,18 @@ const Upload = () => {
       return;
     }
 
+    // Duration limits
+    if (duration !== null) {
+      if (isShort && duration > 180) {
+        toast({ title: "Too long for a Short", description: "Shorts must be 3 minutes or less.", variant: "destructive" });
+        return;
+      }
+      if (!isShort && duration > 60 * 60) {
+        toast({ title: "Video too long", description: "Max 1 hour.", variant: "destructive" });
+        return;
+      }
+    }
+
     setUploading(true);
     setProgress(3);
 
@@ -141,6 +153,8 @@ const Upload = () => {
           storage_path: path,
           mime_type: file.type,
           size_bytes: file.size,
+          is_short: isShort,
+          duration_seconds: duration,
         },
       });
       if (regErr || (regData as any)?.error) {
