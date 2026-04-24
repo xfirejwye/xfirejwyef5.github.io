@@ -55,11 +55,12 @@ const Reels = () => {
   useEffect(() => {
     document.title = "Reels · F5 Videos";
     (async () => {
+      // Include anything explicitly marked as a short OR any video with a known duration <= 60s
       const { data, error } = await supabase
         .from("videos")
         .select("id,title,description,uploader_name,views,created_at,storage_path,duration_seconds")
         .eq("is_hidden", false)
-        .eq("is_short", true)
+        .or("is_short.eq.true,duration_seconds.lte.60")
         .order("created_at", { ascending: false })
         .limit(50);
       if (error) {
