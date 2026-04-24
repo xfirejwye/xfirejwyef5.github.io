@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { Upload, Home } from "lucide-react";
+import { Upload, Home, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import logo from "@/assets/logo.png";
@@ -30,6 +30,16 @@ export const Header = () => {
             }
           >
             <span className="inline-flex items-center gap-1.5"><Home className="h-4 w-4" /> Home</span>
+          </NavLink>
+          <NavLink
+            to="/reels"
+            className={({ isActive }) =>
+              `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              }`
+            }
+          >
+            <span className="inline-flex items-center gap-1.5"><Flame className="h-4 w-4" /> Reels</span>
           </NavLink>
         </nav>
 

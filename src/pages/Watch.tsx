@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { Eye, Flag, Loader2, User } from "lucide-react";
+import { Eye, Flag, Loader2, User, Rewind, FastForward, SkipForward } from "lucide-react";
 import { formatRelativeTime, formatViews } from "@/lib/format";
 import { VideoCard, type VideoCardData } from "@/components/VideoCard";
 import { Comments } from "@/components/Comments";
@@ -26,11 +26,24 @@ interface Video extends VideoCardData {
 
 const Watch = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [video, setVideo] = useState<Video | null | undefined>(undefined);
   const [related, setRelated] = useState<VideoCardData[]>([]);
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [submittingReport, setSubmittingReport] = useState(false);
+
+  const seek = (delta: number) => {
+    const el = videoRef.current;
+    if (!el) return;
+    const next = Math.max(0, Math.min((el.duration || 0) - 0.1, el.currentTime + delta));
+    el.currentTime = next;
+  };
+  const goNext = () => {
+    const next = related[0];
+    if (next) navigate(`/watch/${next.id}`);
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -110,12 +123,32 @@ const Watch = () => {
           <div>
             <div className="overflow-hidden rounded-2xl bg-black shadow-card aspect-video">
               <video
+                ref={videoRef}
                 src={videoUrl}
                 controls
                 autoPlay
                 playsInline
+                onEnded={goNext}
                 className="h-full w-full"
               />
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={() => seek(-10)}>
+                <Rewind className="h-4 w-4" /> -10s
+              </Button>
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={() => seek(10)}>
+                <FastForward className="h-4 w-4" /> +10s
+              </Button>
+              <Button
+                variant="hero"
+                size="sm"
+                className="gap-1.5 ml-auto"
+                onClick={goNext}
+                disabled={related.length === 0}
+              >
+                <SkipForward className="h-4 w-4" /> Next video
+              </Button>
             </div>
 
             <h1 className="mt-5 font-display text-2xl md:text-3xl tracking-wide leading-tight">

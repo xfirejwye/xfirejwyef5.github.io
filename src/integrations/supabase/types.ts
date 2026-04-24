@@ -168,9 +168,11 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          duration_seconds: number | null
           id: string
           ip_address: unknown
           is_hidden: boolean
+          is_short: boolean
           mime_type: string | null
           size_bytes: number | null
           storage_path: string
@@ -182,9 +184,11 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
+          duration_seconds?: number | null
           id?: string
           ip_address?: unknown
           is_hidden?: boolean
+          is_short?: boolean
           mime_type?: string | null
           size_bytes?: number | null
           storage_path: string
@@ -196,9 +200,11 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
+          duration_seconds?: number | null
           id?: string
           ip_address?: unknown
           is_hidden?: boolean
+          is_short?: boolean
           mime_type?: string | null
           size_bytes?: number | null
           storage_path?: string

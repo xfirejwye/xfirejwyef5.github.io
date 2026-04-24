@@ -6,17 +6,39 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
-import { UploadCloud, Film } from "lucide-react";
+import { UploadCloud, Film, Flame } from "lucide-react";
 import { formatBytes } from "@/lib/format";
 import { getClientFingerprint } from "@/lib/clientFingerprint";
 
 const MAX_BYTES = 500 * 1024 * 1024; // 500 MB
 
+const probeDuration = (file: File): Promise<number | null> =>
+  new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const v = document.createElement("video");
+    v.preload = "metadata";
+    v.muted = true;
+    v.src = url;
+    const cleanup = () => URL.revokeObjectURL(url);
+    v.onloadedmetadata = () => {
+      const d = isFinite(v.duration) ? v.duration : null;
+      cleanup();
+      resolve(d);
+    };
+    v.onerror = () => {
+      cleanup();
+      resolve(null);
+    };
+  });
+
 const Upload = () => {
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
+  const [duration, setDuration] = useState<number | null>(null);
+  const [isShort, setIsShort] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [uploaderName, setUploaderName] = useState("");
@@ -25,7 +47,7 @@ const Upload = () => {
   const [uploading, setUploading] = useState(false);
   const [formMountedAt] = useState(() => Date.now());
 
-  const onPickFile = (f: File | null) => {
+  const onPickFile = async (f: File | null) => {
     if (!f) return;
     if (!f.type.startsWith("video/")) {
       toast({ title: "Not a video", description: "Please pick a video file.", variant: "destructive" });
@@ -41,6 +63,10 @@ const Upload = () => {
     }
     setFile(f);
     if (!title) setTitle(f.name.replace(/\.[^.]+$/, ""));
+    const d = await probeDuration(f);
+    setDuration(d);
+    // Auto-suggest Short if <= 60s
+    if (d !== null && d <= 60) setIsShort(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,6 +89,18 @@ const Upload = () => {
     if (Date.now() - formMountedAt < 3000) {
       toast({ title: "Slow down", description: "Please take a moment to fill the form.", variant: "destructive" });
       return;
+    }
+
+    // Duration limits
+    if (duration !== null) {
+      if (isShort && duration > 180) {
+        toast({ title: "Too long for a Short", description: "Shorts must be 3 minutes or less.", variant: "destructive" });
+        return;
+      }
+      if (!isShort && duration > 60 * 60) {
+        toast({ title: "Video too long", description: "Max 1 hour.", variant: "destructive" });
+        return;
+      }
     }
 
     setUploading(true);
@@ -115,6 +153,8 @@ const Upload = () => {
           storage_path: path,
           mime_type: file.type,
           size_bytes: file.size,
+          is_short: isShort,
+          duration_seconds: duration,
         },
       });
       if (regErr || (regData as any)?.error) {
@@ -162,7 +202,10 @@ const Upload = () => {
                 <Film className="h-10 w-10 text-primary" />
                 <div className="text-center">
                   <p className="font-medium">{file.name}</p>
-                  <p className="text-sm text-muted-foreground">{formatBytes(file.size)}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatBytes(file.size)}
+                    {duration !== null && ` · ${Math.round(duration)}s`}
+                  </p>
                 </div>
               </>
             ) : (
@@ -183,6 +226,24 @@ const Upload = () => {
               disabled={uploading}
             />
           </label>
+
+          <div className="rounded-xl border border-border bg-card/40 p-4 flex items-start gap-4">
+            <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
+              <Flame className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-3">
+                <Label htmlFor="is-short" className="font-medium cursor-pointer">Publish as Short</Label>
+                <Switch id="is-short" checked={isShort} onCheckedChange={setIsShort} disabled={uploading} />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Shorts appear in the vertical Reels feed. Max 3 minutes when enabled, otherwise 60s for the feed.
+                {duration !== null && isShort && duration > 180 && (
+                  <span className="block mt-1 text-destructive">This video is {Math.round(duration)}s — too long for a Short.</span>
+                )}
+              </p>
+            </div>
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="title">Title *</Label>
