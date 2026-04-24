@@ -166,9 +166,15 @@ const Index = () => {
             </p>
           </div>
 
-          <p className="text-xs">
-            For takedown requests, use the report button on any video.
-          </p>
+          <div className="flex flex-col sm:items-end gap-1 text-xs">
+            <Link
+              to="/privacy-policy"
+              className="text-foreground/80 hover:text-primary transition-colors font-medium"
+            >
+              Privacy Policy
+            </Link>
+            <p>For takedown requests, use the report button on any video.</p>
+          </div>
         </div>
       </footer>
     </div>
