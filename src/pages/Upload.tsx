@@ -6,17 +6,39 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
-import { UploadCloud, Film } from "lucide-react";
+import { UploadCloud, Film, Flame } from "lucide-react";
 import { formatBytes } from "@/lib/format";
 import { getClientFingerprint } from "@/lib/clientFingerprint";
 
 const MAX_BYTES = 500 * 1024 * 1024; // 500 MB
 
+const probeDuration = (file: File): Promise<number | null> =>
+  new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const v = document.createElement("video");
+    v.preload = "metadata";
+    v.muted = true;
+    v.src = url;
+    const cleanup = () => URL.revokeObjectURL(url);
+    v.onloadedmetadata = () => {
+      const d = isFinite(v.duration) ? v.duration : null;
+      cleanup();
+      resolve(d);
+    };
+    v.onerror = () => {
+      cleanup();
+      resolve(null);
+    };
+  });
+
 const Upload = () => {
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
+  const [duration, setDuration] = useState<number | null>(null);
+  const [isShort, setIsShort] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [uploaderName, setUploaderName] = useState("");
@@ -25,7 +47,7 @@ const Upload = () => {
   const [uploading, setUploading] = useState(false);
   const [formMountedAt] = useState(() => Date.now());
 
-  const onPickFile = (f: File | null) => {
+  const onPickFile = async (f: File | null) => {
     if (!f) return;
     if (!f.type.startsWith("video/")) {
       toast({ title: "Not a video", description: "Please pick a video file.", variant: "destructive" });
@@ -41,6 +63,10 @@ const Upload = () => {
     }
     setFile(f);
     if (!title) setTitle(f.name.replace(/\.[^.]+$/, ""));
+    const d = await probeDuration(f);
+    setDuration(d);
+    // Auto-suggest Short if <= 60s
+    if (d !== null && d <= 60) setIsShort(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
