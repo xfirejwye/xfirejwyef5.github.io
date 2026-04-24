@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./pages/Index.tsx";
 import Upload from "./pages/Upload.tsx";
 import Watch from "./pages/Watch.tsx";
+import Reels from "./pages/Reels.tsx";
 import Admin from "./pages/Admin.tsx";
 import Auth from "./pages/Auth.tsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
@@ -26,6 +27,8 @@ const App = () => (
             <Route path="/upload" element={<Upload />} />
             <Route path="/watch/:id" element={<Watch />} />
             <Route path="/v/:id" element={<Watch />} />
+            <Route path="/reels" element={<Reels />} />
+            <Route path="/reels/:id" element={<Reels />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
