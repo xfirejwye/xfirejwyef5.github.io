@@ -25,8 +25,15 @@ Deno.serve(async (req) => {
 
   try {
     const payload = await req.json();
-    const { title, description, uploader_name, storage_path, mime_type, size_bytes } = payload;
+    const { title, description, uploader_name, storage_path, mime_type, size_bytes, is_short, duration_seconds } = payload;
     if (!title || !storage_path) return json(400, { error: "Missing fields" });
+
+    const isShort = !!is_short;
+    const dur = typeof duration_seconds === "number" && isFinite(duration_seconds) ? duration_seconds : null;
+    if (dur !== null) {
+      const cap = isShort ? 180 : 60 * 60; // 3 min for shorts, 1h for normal
+      if (dur > cap) return json(400, { error: isShort ? "Shorts must be 3 minutes or less." : "Video too long." });
+    }
 
     const ip = getClientIp(req);
     const supabase = createClient(
@@ -53,6 +60,8 @@ Deno.serve(async (req) => {
         mime_type: mime_type ?? null,
         size_bytes: size_bytes ?? null,
         ip_address: ip,
+        is_short: isShort,
+        duration_seconds: dur,
       })
       .select("id")
       .single();
