@@ -40,7 +40,8 @@ const NotFound = () => {
         style={{
           position: "absolute",
           inset: 0,
-          background: "radial-gradient(ellipse at center, transparent 30%, #0a0a0a 80%)",
+          background:
+            "radial-gradient(ellipse at center, transparent 30%, #0a0a0a 80%)",
         }}
       />
 
@@ -58,8 +59,30 @@ const NotFound = () => {
         }}
       >
         {/* Corner accents */}
-        <span style={{ position: "absolute", top: 10, left: 10, width: 12, height: 12, borderTop: "1px solid rgba(159,0,0,0.3)", borderLeft: "1px solid rgba(159,0,0,0.3)", borderRadius: "2px 0 0 0" }} />
-        <span style={{ position: "absolute", bottom: 10, right: 10, width: 12, height: 12, borderBottom: "1px solid rgba(159,0,0,0.3)", borderRight: "1px solid rgba(159,0,0,0.3)", borderRadius: "0 0 2px 0" }} />
+        <span
+          style={{
+            position: "absolute",
+            top: 10,
+            left: 10,
+            width: 12,
+            height: 12,
+            borderTop: "1px solid rgba(159,0,0,0.3)",
+            borderLeft: "1px solid rgba(159,0,0,0.3)",
+            borderRadius: "2px 0 0 0",
+          }}
+        />
+        <span
+          style={{
+            position: "absolute",
+            bottom: 10,
+            right: 10,
+            width: 12,
+            height: 12,
+            borderBottom: "1px solid rgba(159,0,0,0.3)",
+            borderRight: "1px solid rgba(159,0,0,0.3)",
+            borderRadius: "0 0 2px 0",
+          }}
+        />
 
         {/* Logo */}
         <div
@@ -75,7 +98,11 @@ const NotFound = () => {
             justifyContent: "center",
           }}
         >
-          <img src="/favicon.png" alt="icon" style={{ width: 32, height: 32, objectFit: "contain", opacity: 0.85 }} />
+          <img
+            src="/favicon.png"
+            alt="icon"
+            style={{ width: 32, height: 32, objectFit: "contain", opacity: 0.85 }}
+          />
         </div>
 
         {/* Badge */}
@@ -123,10 +150,26 @@ const NotFound = () => {
           404
         </div>
 
-        <p style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: "#e8e8e8", margin: "0 0 8px", fontWeight: 400 }}>
+        <p
+          style={{
+            fontFamily: "'DM Serif Display', serif",
+            fontSize: 20,
+            color: "#e8e8e8",
+            margin: "0 0 8px",
+            fontWeight: 400,
+          }}
+        >
           Page not found
         </p>
-        <p style={{ fontSize: 13, color: "#555", lineHeight: 1.6, margin: "0 0 20px", fontWeight: 300 }}>
+        <p
+          style={{
+            fontSize: 13,
+            color: "#555",
+            lineHeight: 1.6,
+            margin: "0 0 20px",
+            fontWeight: 300,
+          }}
+        >
           The page you're looking for doesn't exist or may have been moved.
         </p>
 
@@ -148,11 +191,25 @@ const NotFound = () => {
           {location.pathname}
         </div>
 
-        <hr style={{ height: "0.5px", background: "#1e1e1e", border: "none", margin: "0 0 24px" }} />
+        <hr
+          style={{
+            height: "0.5px",
+            background: "#1e1e1e",
+            border: "none",
+            margin: "0 0 24px",
+          }}
+        />
 
         {/* Actions */}
-        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-          
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <a
             href="/"
             style={{
               padding: "10px 22px",
