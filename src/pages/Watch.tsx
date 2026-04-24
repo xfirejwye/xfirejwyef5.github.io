@@ -123,12 +123,32 @@ const Watch = () => {
           <div>
             <div className="overflow-hidden rounded-2xl bg-black shadow-card aspect-video">
               <video
+                ref={videoRef}
                 src={videoUrl}
                 controls
                 autoPlay
                 playsInline
+                onEnded={goNext}
                 className="h-full w-full"
               />
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={() => seek(-10)}>
+                <Rewind className="h-4 w-4" /> -10s
+              </Button>
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={() => seek(10)}>
+                <FastForward className="h-4 w-4" /> +10s
+              </Button>
+              <Button
+                variant="hero"
+                size="sm"
+                className="gap-1.5 ml-auto"
+                onClick={goNext}
+                disabled={related.length === 0}
+              >
+                <SkipForward className="h-4 w-4" /> Next video
+              </Button>
             </div>
 
             <h1 className="mt-5 font-display text-2xl md:text-3xl tracking-wide leading-tight">
