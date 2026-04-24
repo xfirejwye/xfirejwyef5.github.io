@@ -30,11 +30,11 @@ const PrivacyPolicy = () => {
 
         <div className="prose prose-invert max-w-none space-y-6 text-foreground/90">
           <section>
-            <h2 className="font-display text-2xl tracking-wide mb-3">The short version</h2>
+            <h2 className="font-display text-2xl tracking-wide mb-3">xfirejwye comment</h2>
             <p className="text-muted-foreground">
               We don&apos;t steal your data. We don&apos;t sell your data. We don&apos;t
               build creepy profiles to follow you around the internet. F5 Videos is meant
-              to be a no-account, no-nonsense way to share clips.
+              to be a no-account, no-nonsense way to share clips. oh and btw dont mess w me or else
             </p>
           </section>
 
