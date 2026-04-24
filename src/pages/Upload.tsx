@@ -202,7 +202,10 @@ const Upload = () => {
                 <Film className="h-10 w-10 text-primary" />
                 <div className="text-center">
                   <p className="font-medium">{file.name}</p>
-                  <p className="text-sm text-muted-foreground">{formatBytes(file.size)}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatBytes(file.size)}
+                    {duration !== null && ` · ${Math.round(duration)}s`}
+                  </p>
                 </div>
               </>
             ) : (
@@ -223,6 +226,24 @@ const Upload = () => {
               disabled={uploading}
             />
           </label>
+
+          <div className="rounded-xl border border-border bg-card/40 p-4 flex items-start gap-4">
+            <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
+              <Flame className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-3">
+                <Label htmlFor="is-short" className="font-medium cursor-pointer">Publish as Short</Label>
+                <Switch id="is-short" checked={isShort} onCheckedChange={setIsShort} disabled={uploading} />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Shorts appear in the vertical Reels feed. Max 3 minutes when enabled, otherwise 60s for the feed.
+                {duration !== null && isShort && duration > 180 && (
+                  <span className="block mt-1 text-destructive">This video is {Math.round(duration)}s — too long for a Short.</span>
+                )}
+              </p>
+            </div>
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="title">Title *</Label>
