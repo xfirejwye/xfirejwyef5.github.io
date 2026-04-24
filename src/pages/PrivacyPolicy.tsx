@@ -58,10 +58,6 @@ const PrivacyPolicy = () => {
               <li>A view counter for each video.</li>
               <li>Comments you post (anonymous, with whatever name you choose).</li>
               <li>
-                Your IP address — only visible to site moderators, used solely for
-                blocking spam, abuse, or illegal content.
-              </li>
-              <li>
                 A small <code className="px-1 py-0.5 rounded bg-muted text-xs">localStorage</code>{" "}
                 value to remember your chosen comment name on this device.
               </li>
