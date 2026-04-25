@@ -45,7 +45,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Header />
       <main className="container max-w-sm py-20">
         <form onSubmit={submit} className="space-y-4 rounded-2xl border border-border p-6 shadow-card">
