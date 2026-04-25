@@ -7,14 +7,14 @@ import logo from "@/assets/logo.png";
 export const Header = () => {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="container flex h-16 items-center justify-between gap-4">
+      <div className="container flex h-14 md:h-16 items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2 group">
           <img
             src={logo}
             alt="F5 Videos"
-            className="h-9 w-9 object-contain transition-transform group-hover:scale-110"
+            className="h-8 w-8 md:h-9 md:w-9 object-contain transition-transform group-hover:scale-110"
           />
-          <span className="font-display text-2xl tracking-widest leading-none">
+          <span className="font-display text-xl md:text-2xl tracking-widest leading-none">
             F5<span className="text-primary">VIDEOS</span>
           </span>
         </Link>
@@ -45,7 +45,7 @@ export const Header = () => {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Button asChild variant="hero" size="sm" className="gap-2">
+          <Button asChild variant="hero" size="sm" className="gap-2 hidden md:inline-flex">
             <Link to="/upload">
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Upload</span>

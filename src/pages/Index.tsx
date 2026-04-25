@@ -50,25 +50,25 @@ const Index = () => {
         <section className="relative overflow-hidden border-b border-border/60">
           <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
 
-          <div className="container relative py-14 md:py-20">
+          <div className="container relative py-10 md:py-20">
             <div className="max-w-3xl">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                 <Sparkles className="h-3.5 w-3.5" />
                 No account · No limits
               </span>
 
-              <h1 className="mt-4 font-display text-5xl md:text-7xl tracking-wider leading-[0.95]">
+              <h1 className="mt-4 font-display text-4xl sm:text-5xl md:text-7xl tracking-wider leading-[0.95]">
                 Drop a video.
                 <br />
                 <span className="text-gradient">Stay anonymous.</span>
               </h1>
 
-              <p className="mt-5 max-w-xl text-lg text-muted-foreground">
+              <p className="mt-4 max-w-xl text-base md:text-lg text-muted-foreground">
                 F5 Videos is a no-signup video host. Upload up to 500 MB,
                 add a title, and share the link. That&apos;s it.
               </p>
 
-              <div className="mt-7 flex flex-wrap gap-3">
+              <div className="mt-6 flex flex-wrap gap-3">
                 <Button asChild variant="hero" size="lg" className="gap-2">
                   <Link to="/upload">
                     <Upload className="h-5 w-5" />
