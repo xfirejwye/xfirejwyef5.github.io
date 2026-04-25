@@ -479,4 +479,28 @@ const Reels = () => {
   );
 };
 
+const ReelLikeButton = ({ videoId }: { videoId: string }) => {
+  const { count, liked, busy, toggle } = useVideoLike(videoId);
+  return (
+    <button
+      onClick={toggle}
+      disabled={busy || liked}
+      className="flex flex-col items-center group disabled:opacity-100"
+      aria-label="Like"
+      aria-pressed={liked}
+    >
+      <span
+        className={cn(
+          "grid h-11 w-11 place-items-center rounded-full backdrop-blur transition-colors",
+          liked ? "bg-primary/90 text-primary-foreground" : "bg-white/10 group-hover:bg-white/20",
+        )}
+      >
+        <Heart className={cn("h-5 w-5", liked && "fill-current")} />
+      </span>
+      <span className="mt-1 text-xs font-medium">{formatCount(count)}</span>
+    </button>
+  );
+};
+
 export default Reels;
+
