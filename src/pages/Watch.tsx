@@ -14,10 +14,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { Eye, Flag, Loader2, User, Rewind, FastForward, SkipForward } from "lucide-react";
-import { formatRelativeTime, formatViews } from "@/lib/format";
+import { Eye, Flag, Loader2, User, Rewind, FastForward, SkipForward, Heart } from "lucide-react";
+import { formatRelativeTime, formatViews, formatCount } from "@/lib/format";
 import { VideoCard, type VideoCardData } from "@/components/VideoCard";
 import { Comments } from "@/components/Comments";
+import { useVideoLike } from "@/hooks/useVideoLike";
+import { cn } from "@/lib/utils";
 
 interface Video extends VideoCardData {
   description: string | null;
@@ -33,6 +35,7 @@ const Watch = () => {
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [submittingReport, setSubmittingReport] = useState(false);
+  const { count: likeCount, liked, busy: likeBusy, toggle: toggleLike } = useVideoLike(id);
 
   const seek = (delta: number) => {
     const el = videoRef.current;
@@ -171,12 +174,25 @@ const Watch = () => {
                 <span>{formatRelativeTime(video.created_at)}</span>
               </div>
 
-              <Dialog open={reportOpen} onOpenChange={setReportOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Flag className="h-4 w-4" /> Report
-                  </Button>
-                </DialogTrigger>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn("gap-2", liked && "text-primary border-primary/50")}
+                  onClick={toggleLike}
+                  disabled={likeBusy || liked}
+                  aria-pressed={liked}
+                >
+                  <Heart className={cn("h-4 w-4", liked && "fill-current")} />
+                  {formatCount(likeCount)}
+                </Button>
+
+                <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Flag className="h-4 w-4" /> Report
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Report this video</DialogTitle>
@@ -198,7 +214,8 @@ const Watch = () => {
                     </Button>
                   </DialogFooter>
                 </DialogContent>
-              </Dialog>
+                </Dialog>
+              </div>
             </div>
 
             {video.description && (

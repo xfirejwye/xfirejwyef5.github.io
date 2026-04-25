@@ -21,6 +21,12 @@ export const formatRelativeTime = (iso: string) => {
   return `${Math.floor(day / 365)}y ago`;
 };
 
+export const formatCount = (n: number) => {
+  if (n < 1000) return `${n}`;
+  if (n < 1_000_000) return `${(n / 1000).toFixed(n < 10_000 ? 1 : 0)}K`;
+  return `${(n / 1_000_000).toFixed(1)}M`;
+};
+
 export const formatBytes = (bytes: number) => {
   if (!bytes) return "0 B";
   const units = ["B", "KB", "MB", "GB"];

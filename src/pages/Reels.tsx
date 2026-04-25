@@ -15,13 +15,16 @@ import {
   ChevronUp,
   ChevronDown,
   Flag,
+  Heart,
   Loader2,
   MessageCircle,
   Play,
   Share2,
   X,
 } from "lucide-react";
-import { formatRelativeTime } from "@/lib/format";
+import { formatRelativeTime, formatCount } from "@/lib/format";
+import { useVideoLike } from "@/hooks/useVideoLike";
+import { cn } from "@/lib/utils";
 
 interface Reel {
   id: string;
@@ -217,6 +220,27 @@ const Reels = () => {
     if (next) itemRefs.current.get(next.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // Snap one reel per wheel "tick" (desktop). Prevents skipping multiple at once
+  // on high-resolution mice/trackpads.
+  useEffect(() => {
+    const root = containerRef.current;
+    if (!root || !reels || reels.length === 0) return;
+    let lock = false;
+    const onWheel = (e: WheelEvent) => {
+      // Ignore tiny horizontal/jitter events
+      if (Math.abs(e.deltaY) < 4) return;
+      e.preventDefault();
+      if (lock) return;
+      lock = true;
+      scrollBy(e.deltaY > 0 ? 1 : -1);
+      window.setTimeout(() => {
+        lock = false;
+      }, 550);
+    };
+    root.addEventListener("wheel", onWheel, { passive: false });
+    return () => root.removeEventListener("wheel", onWheel);
+  }, [reels, activeId]);
+
   const handleVideoClick = (id: string) => {
     if (id !== activeId) return;
     setPaused((p) => {
@@ -348,6 +372,8 @@ const Reels = () => {
 
                       {/* Right-side action buttons */}
                       <div className="absolute right-2 md:right-3 bottom-24 flex flex-col items-center gap-5 text-white">
+                        <ReelLikeButton videoId={r.id} />
+
                         <button
                           onClick={() => setCommentsOpenFor(r.id)}
                           className="flex flex-col items-center group"
@@ -453,4 +479,28 @@ const Reels = () => {
   );
 };
 
+const ReelLikeButton = ({ videoId }: { videoId: string }) => {
+  const { count, liked, busy, toggle } = useVideoLike(videoId);
+  return (
+    <button
+      onClick={toggle}
+      disabled={busy || liked}
+      className="flex flex-col items-center group disabled:opacity-100"
+      aria-label="Like"
+      aria-pressed={liked}
+    >
+      <span
+        className={cn(
+          "grid h-11 w-11 place-items-center rounded-full backdrop-blur transition-colors",
+          liked ? "bg-primary/90 text-primary-foreground" : "bg-white/10 group-hover:bg-white/20",
+        )}
+      >
+        <Heart className={cn("h-5 w-5", liked && "fill-current")} />
+      </span>
+      <span className="mt-1 text-xs font-medium">{formatCount(count)}</span>
+    </button>
+  );
+};
+
 export default Reels;
+

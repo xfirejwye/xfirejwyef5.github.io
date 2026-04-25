@@ -128,6 +128,42 @@ export type Database = {
           },
         ]
       }
+      video_likes: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: unknown
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address: unknown
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_likes_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_likes_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_reports: {
         Row: {
           created_at: string
@@ -313,6 +349,7 @@ export type Database = {
     }
     Functions: {
       check_upload_rate_limit: { Args: { _ip_hash: string }; Returns: Json }
+      has_liked_video: { Args: { _video_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -322,6 +359,7 @@ export type Database = {
       }
       increment_video_views: { Args: { _video_id: string }; Returns: undefined }
       is_ip_blocked: { Args: { _ip: unknown; _kind: string }; Returns: boolean }
+      like_video: { Args: { _video_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"
