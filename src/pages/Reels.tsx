@@ -220,6 +220,27 @@ const Reels = () => {
     if (next) itemRefs.current.get(next.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // Snap one reel per wheel "tick" (desktop). Prevents skipping multiple at once
+  // on high-resolution mice/trackpads.
+  useEffect(() => {
+    const root = containerRef.current;
+    if (!root || !reels || reels.length === 0) return;
+    let lock = false;
+    const onWheel = (e: WheelEvent) => {
+      // Ignore tiny horizontal/jitter events
+      if (Math.abs(e.deltaY) < 4) return;
+      e.preventDefault();
+      if (lock) return;
+      lock = true;
+      scrollBy(e.deltaY > 0 ? 1 : -1);
+      window.setTimeout(() => {
+        lock = false;
+      }, 550);
+    };
+    root.addEventListener("wheel", onWheel, { passive: false });
+    return () => root.removeEventListener("wheel", onWheel);
+  }, [reels, activeId]);
+
   const handleVideoClick = (id: string) => {
     if (id !== activeId) return;
     setPaused((p) => {
