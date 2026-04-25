@@ -213,7 +213,8 @@ const Watch = () => {
                     </Button>
                   </DialogFooter>
                 </DialogContent>
-              </Dialog>
+                </Dialog>
+              </div>
             </div>
 
             {video.description && (
