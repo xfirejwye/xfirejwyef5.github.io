@@ -59,19 +59,95 @@ const Reels = () => {
   useEffect(() => {
     document.title = "Reels · F5 Videos";
     (async () => {
+      // Fetch all visible videos; we'll filter to <=60s on the client
+      // (for older uploads we don't have duration_seconds stored yet).
       const { data, error } = await supabase
         .from("videos")
-        .select("id,title,description,uploader_name,views,created_at,storage_path,duration_seconds")
+        .select("id,title,description,uploader_name,views,created_at,storage_path,duration_seconds,is_short")
         .eq("is_hidden", false)
-        .or("is_short.eq.true,duration_seconds.lte.60")
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(200);
       if (error) {
         toast({ title: "Could not load reels", description: error.message, variant: "destructive" });
         setReels([]);
         return;
       }
-      setReels((data as Reel[]) ?? []);
+      const all = (data as (Reel & { is_short?: boolean })[]) ?? [];
+
+      // Quick pass: anything we already know qualifies (short flag or known duration <=60)
+      const knownQualifies = (v: { is_short?: boolean; duration_seconds: number | null }) =>
+        v.is_short === true || (v.duration_seconds != null && v.duration_seconds <= 60);
+      const knownDisqualifies = (v: { is_short?: boolean; duration_seconds: number | null }) =>
+        v.is_short !== true && v.duration_seconds != null && v.duration_seconds > 60;
+
+      const qualified = all.filter(knownQualifies);
+      const unknown = all.filter((v) => !knownQualifies(v) && !knownDisqualifies(v));
+
+      // Show what we already know immediately
+      setReels(qualified);
+
+      if (unknown.length === 0) return;
+
+      // Probe unknown durations in the browser, with limited concurrency
+      const probe = (url: string) =>
+        new Promise<number | null>((resolve) => {
+          const v = document.createElement("video");
+          v.preload = "metadata";
+          v.muted = true;
+          v.src = url;
+          const done = (n: number | null) => {
+            v.removeAttribute("src");
+            v.load();
+            resolve(n);
+          };
+          v.onloadedmetadata = () => done(isFinite(v.duration) ? v.duration : null);
+          v.onerror = () => done(null);
+          // Safety timeout
+          setTimeout(() => done(null), 8000);
+        });
+
+      const CONCURRENCY = 4;
+      const results: { v: Reel; duration: number | null }[] = [];
+      let i = 0;
+      const workers = Array.from({ length: Math.min(CONCURRENCY, unknown.length) }, async () => {
+        while (i < unknown.length) {
+          const idx = i++;
+          const item = unknown[idx];
+          const url = supabase.storage.from("videos").getPublicUrl(item.storage_path).data.publicUrl;
+          const d = await probe(url);
+          results.push({ v: item, duration: d });
+        }
+      });
+      await Promise.all(workers);
+
+      const newlyQualified = results
+        .filter((r) => r.duration != null && r.duration <= 60)
+        .map((r) => ({ ...r.v, duration_seconds: r.duration as number }));
+
+      if (newlyQualified.length > 0) {
+        // Merge + keep newest-first order
+        setReels((prev) => {
+          const map = new Map<string, Reel>();
+          [...(prev ?? []), ...newlyQualified].forEach((r) => map.set(r.id, r));
+          return Array.from(map.values()).sort(
+            (a, b) => +new Date(b.created_at) - +new Date(a.created_at),
+          );
+        });
+      }
+
+      // Best-effort: persist measured durations so future loads skip probing.
+      // Will silently fail if anon UPDATE isn't allowed by RLS (current schema disallows it).
+      const toPersist = results.filter((r) => r.duration != null);
+      if (toPersist.length > 0) {
+        await Promise.allSettled(
+          toPersist.map((r) =>
+            supabase
+              .from("videos")
+              .update({ duration_seconds: r.duration as number })
+              .eq("id", r.v.id),
+          ),
+        );
+      }
     })();
   }, []);
 
