@@ -34,6 +34,7 @@ const Watch = () => {
   const [related, setRelated] = useState<VideoCardData[]>([]);
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState("");
+  const [submittingReport, setSubmittingReport] = useState(false);
   const { count: likeCount, liked, busy: likeBusy, toggle: toggleLike } = useVideoLike(id);
 
   const seek = (delta: number) => {
