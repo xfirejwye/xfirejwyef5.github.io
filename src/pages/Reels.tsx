@@ -15,13 +15,16 @@ import {
   ChevronUp,
   ChevronDown,
   Flag,
+  Heart,
   Loader2,
   MessageCircle,
   Play,
   Share2,
   X,
 } from "lucide-react";
-import { formatRelativeTime } from "@/lib/format";
+import { formatRelativeTime, formatCount } from "@/lib/format";
+import { useVideoLike } from "@/hooks/useVideoLike";
+import { cn } from "@/lib/utils";
 
 interface Reel {
   id: string;
