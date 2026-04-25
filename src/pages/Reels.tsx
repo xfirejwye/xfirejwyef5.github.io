@@ -14,17 +14,14 @@ import { toast } from "@/hooks/use-toast";
 import {
   ChevronUp,
   ChevronDown,
-  Eye,
   Flag,
   Loader2,
   MessageCircle,
-  Pause,
   Play,
   Share2,
-  Volume2,
-  VolumeX,
+  X,
 } from "lucide-react";
-import { formatRelativeTime, formatViews } from "@/lib/format";
+import { formatRelativeTime } from "@/lib/format";
 
 interface Reel {
   id: string;
@@ -47,9 +44,17 @@ const Reels = () => {
 
   const [reels, setReels] = useState<Reel[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [muted, setMuted] = useState(true);
   const [paused, setPaused] = useState(false);
   const [commentsOpenFor, setCommentsOpenFor] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     document.title = "Reels · F5 Videos";
@@ -102,16 +107,18 @@ const Reels = () => {
     return () => io.disconnect();
   }, [reels]);
 
+  // Audio is always unmuted; only mute when paused
   useEffect(() => {
     videoRefs.current.forEach((v, id) => {
       if (id === activeId) {
-        v.muted = muted;
+        v.muted = paused; // muted only when paused
         if (!paused) {
           v.play().catch(() => {});
         } else {
           v.pause();
         }
       } else {
+        v.muted = true;
         v.pause();
         v.currentTime = 0;
       }
@@ -120,7 +127,7 @@ const Reels = () => {
       viewedRef.current.add(activeId);
       supabase.rpc("increment_video_views", { _video_id: activeId }).then(() => {});
     }
-  }, [activeId, muted, paused]);
+  }, [activeId, paused]);
 
   const activeReel = useMemo(
     () => (reels && activeId ? reels.find((r) => r.id === activeId) ?? null : null),
@@ -140,6 +147,7 @@ const Reels = () => {
       const next = !p;
       const video = videoRefs.current.get(id);
       if (video) {
+        video.muted = next; // mute when pausing
         if (next) {
           video.pause();
         } else {
@@ -176,6 +184,8 @@ const Reels = () => {
     toast({ title: "Reported", description: "Thanks — moderators will review." });
   };
 
+  const commentsOpen = !!commentsOpenFor;
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
@@ -195,170 +205,174 @@ const Reels = () => {
             </Button>
           </div>
         ) : (
-          <div
-            ref={containerRef}
-            className="h-[calc(100vh-4rem)] overflow-y-scroll snap-y snap-mandatory scroll-smooth bg-black"
-            style={{ scrollbarWidth: "none" }}
-          >
-            <style>{`.reels-feed::-webkit-scrollbar{display:none}`}</style>
+          <div className="flex h-[calc(100vh-4rem)]">
+            {/* ── Feed ── */}
+            <div
+              ref={containerRef}
+              className="flex-1 overflow-y-scroll snap-y snap-mandatory scroll-smooth bg-black"
+              style={{ scrollbarWidth: "none" }}
+            >
+              <style>{`div::-webkit-scrollbar{display:none}`}</style>
 
-            {reels.map((r) => {
-              const url = supabase.storage.from("videos").getPublicUrl(r.storage_path).data.publicUrl;
-              const isActive = activeId === r.id;
-              return (
-                <section
-                  key={r.id}
-                  data-id={r.id}
-                  ref={(el) => {
-                    if (el) itemRefs.current.set(r.id, el);
-                    else itemRefs.current.delete(r.id);
-                  }}
-                  className="snap-start h-[calc(100vh-4rem)] w-full grid place-items-center relative"
-                >
-                  <div className="relative h-full w-full md:max-w-[420px] md:mx-auto bg-black">
-                    <video
-                      ref={(el) => {
-                        if (el) videoRefs.current.set(r.id, el);
-                        else videoRefs.current.delete(r.id);
-                      }}
-                      src={url}
-                      loop
-                      playsInline
-                      muted={muted}
-                      preload="metadata"
-                      onClick={() => handleVideoClick(r.id)}
-                      className="h-full w-full object-contain bg-black cursor-pointer"
-                    />
-
-                    {isActive && paused && (
-                      <button
+              {reels.map((r) => {
+                const url = supabase.storage.from("videos").getPublicUrl(r.storage_path).data.publicUrl;
+                const isActive = activeId === r.id;
+                return (
+                  <section
+                    key={r.id}
+                    data-id={r.id}
+                    ref={(el) => {
+                      if (el) itemRefs.current.set(r.id, el);
+                      else itemRefs.current.delete(r.id);
+                    }}
+                    className="snap-start h-[calc(100vh-4rem)] w-full grid place-items-center relative"
+                  >
+                    <div className="relative h-full w-full md:max-w-[420px] md:mx-auto bg-black">
+                      <video
+                        ref={(el) => {
+                          if (el) videoRefs.current.set(r.id, el);
+                          else videoRefs.current.delete(r.id);
+                        }}
+                        src={url}
+                        loop
+                        playsInline
+                        muted={true} // start muted for autoplay policy; unmuted on play via effect
+                        preload="metadata"
                         onClick={() => handleVideoClick(r.id)}
-                        className="absolute inset-0 grid place-items-center bg-black/30"
-                        aria-label="Play"
-                      >
-                        <span className="grid h-20 w-20 place-items-center rounded-full bg-white/15 backdrop-blur-md">
-                          <Play className="h-10 w-10 text-white fill-current" />
-                        </span>
-                      </button>
-                    )}
-
-                    {isActive && !paused && (
-                      <button
-                        onClick={() => handleVideoClick(r.id)}
-                        className="absolute inset-0 grid place-items-center bg-transparent"
-                        aria-label="Pause"
-                        style={{ pointerEvents: "none" }}
+                        className="h-full w-full object-contain bg-black cursor-pointer"
                       />
-                    )}
 
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pb-6">
-                      <p className="text-white font-semibold text-sm">
-                        @{r.uploader_name?.trim() || "anonymous"}
-                      </p>
-                      <h2 className="mt-1 text-white text-base font-medium leading-snug line-clamp-2">
-                        {r.title}
-                      </h2>
-                      {r.description && (
-                        <p className="mt-1 text-white/80 text-xs line-clamp-2">{r.description}</p>
+                      {isActive && paused && (
+                        <button
+                          onClick={() => handleVideoClick(r.id)}
+                          className="absolute inset-0 grid place-items-center bg-black/30"
+                          aria-label="Play"
+                        >
+                          <span className="grid h-20 w-20 place-items-center rounded-full bg-white/15 backdrop-blur-md">
+                            <Play className="h-10 w-10 text-white fill-current" />
+                          </span>
+                        </button>
                       )}
-                      <p className="mt-1 text-white/60 text-xs">
-                        {formatRelativeTime(r.created_at)}
-                      </p>
-                    </div>
 
-                    <div className="absolute right-2 md:right-3 bottom-24 flex flex-col items-center gap-5 text-white">
-                      <button
-                        onClick={() => setMuted((m) => !m)}
-                        className="grid h-11 w-11 place-items-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur transition-colors"
-                        aria-label={muted ? "Unmute" : "Mute"}
-                      >
-                        {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-                      </button>
-
-                      <div className="flex flex-col items-center">
-                        <span className="grid h-11 w-11 place-items-center rounded-full bg-white/10 backdrop-blur">
-                          <Eye className="h-5 w-5" />
-                        </span>
-                        <span className="mt-1 text-xs font-medium tabular-nums">{formatViews(r.views)}</span>
+                      {/* Bottom meta */}
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pb-6">
+                        <p className="text-white font-semibold text-sm">
+                          @{r.uploader_name?.trim() || "anonymous"}
+                        </p>
+                        <h2 className="mt-1 text-white text-base font-medium leading-snug line-clamp-2">
+                          {r.title}
+                        </h2>
+                        {r.description && (
+                          <p className="mt-1 text-white/80 text-xs line-clamp-2">{r.description}</p>
+                        )}
+                        <p className="mt-1 text-white/60 text-xs">
+                          {formatRelativeTime(r.created_at)}
+                        </p>
                       </div>
 
-                      <button
-                        onClick={() => setCommentsOpenFor(r.id)}
-                        className="flex flex-col items-center group"
-                        aria-label="Comments"
-                      >
-                        <span className="grid h-11 w-11 place-items-center rounded-full bg-white/10 group-hover:bg-white/20 backdrop-blur transition-colors">
-                          <MessageCircle className="h-5 w-5" />
-                        </span>
-                        <span className="mt-1 text-xs font-medium">Comments</span>
-                      </button>
+                      {/* Right-side action buttons */}
+                      <div className="absolute right-2 md:right-3 bottom-24 flex flex-col items-center gap-5 text-white">
+                        <button
+                          onClick={() => setCommentsOpenFor(r.id)}
+                          className="flex flex-col items-center group"
+                          aria-label="Comments"
+                        >
+                          <span className="grid h-11 w-11 place-items-center rounded-full bg-white/10 group-hover:bg-white/20 backdrop-blur transition-colors">
+                            <MessageCircle className="h-5 w-5" />
+                          </span>
+                          <span className="mt-1 text-xs font-medium">Comments</span>
+                        </button>
 
-                      <button
-                        onClick={() => share(r)}
-                        className="flex flex-col items-center group"
-                        aria-label="Share"
-                      >
-                        <span className="grid h-11 w-11 place-items-center rounded-full bg-white/10 group-hover:bg-white/20 backdrop-blur transition-colors">
-                          <Share2 className="h-5 w-5" />
-                        </span>
-                        <span className="mt-1 text-xs font-medium">Share</span>
-                      </button>
+                        <button
+                          onClick={() => share(r)}
+                          className="flex flex-col items-center group"
+                          aria-label="Share"
+                        >
+                          <span className="grid h-11 w-11 place-items-center rounded-full bg-white/10 group-hover:bg-white/20 backdrop-blur transition-colors">
+                            <Share2 className="h-5 w-5" />
+                          </span>
+                          <span className="mt-1 text-xs font-medium">Share</span>
+                        </button>
 
-                      <button
-                        onClick={() => report(r)}
-                        className="flex flex-col items-center group"
-                        aria-label="Report"
-                      >
-                        <span className="grid h-11 w-11 place-items-center rounded-full bg-white/10 group-hover:bg-white/20 backdrop-blur transition-colors">
-                          <Flag className="h-5 w-5" />
-                        </span>
-                        <span className="mt-1 text-xs font-medium">Report</span>
-                      </button>
+                        <button
+                          onClick={() => report(r)}
+                          className="flex flex-col items-center group"
+                          aria-label="Report"
+                        >
+                          <span className="grid h-11 w-11 place-items-center rounded-full bg-white/10 group-hover:bg-white/20 backdrop-blur transition-colors">
+                            <Flag className="h-5 w-5" />
+                          </span>
+                          <span className="mt-1 text-xs font-medium">Report</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </section>
-              );
-            })}
+                  </section>
+                );
+              })}
 
-            <div className="hidden md:flex flex-col gap-3 fixed right-6 top-1/2 -translate-y-1/2 z-30">
-              <Button
-                size="icon"
-                variant="outline"
-                className="rounded-full bg-background/70 backdrop-blur"
-                onClick={() => scrollBy(-1)}
-                aria-label="Previous"
-              >
-                <ChevronUp className="h-5 w-5" />
-              </Button>
-              <Button
-                size="icon"
-                variant="outline"
-                className="rounded-full bg-background/70 backdrop-blur"
-                onClick={() => scrollBy(1)}
-                aria-label="Next"
-              >
-                <ChevronDown className="h-5 w-5" />
-              </Button>
+              {/* Desktop prev/next nav */}
+              <div className="hidden md:flex flex-col gap-3 fixed right-6 top-1/2 -translate-y-1/2 z-30">
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="rounded-full bg-background/70 backdrop-blur"
+                  onClick={() => scrollBy(-1)}
+                  aria-label="Previous"
+                >
+                  <ChevronUp className="h-5 w-5" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="rounded-full bg-background/70 backdrop-blur"
+                  onClick={() => scrollBy(1)}
+                  aria-label="Next"
+                >
+                  <ChevronDown className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
+
+            {/* ── Desktop comments sidebar (TikTok-style) ── */}
+            {commentsOpen && !isMobile && (
+              <div className="hidden md:flex flex-col w-[360px] shrink-0 border-l border-border bg-background h-full">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
+                  <span className="font-semibold text-sm">Comments</span>
+                  <button
+                    onClick={() => setCommentsOpenFor(null)}
+                    className="grid h-8 w-8 place-items-center rounded-full hover:bg-muted transition-colors"
+                    aria-label="Close comments"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto px-4 pb-8">
+                  {commentsOpenFor && <Comments videoId={commentsOpenFor} />}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>
 
-      <Sheet
-        open={!!commentsOpenFor}
-        onOpenChange={(o) => {
-          if (!o) setCommentsOpenFor(null);
-        }}
-      >
-        <SheetContent side="bottom" className="h-[80vh] overflow-y-auto p-0">
-          <SheetHeader className="px-4 py-3 border-b border-border sticky top-0 bg-background z-10">
-            <SheetTitle className="text-left">Comments</SheetTitle>
-          </SheetHeader>
-          <div className="px-4 pb-8">
-            {commentsOpenFor && <Comments videoId={commentsOpenFor} />}
-          </div>
-        </SheetContent>
-      </Sheet>
+      {/* ── Mobile comments sheet (bottom drawer, TikTok-style) ── */}
+      {isMobile && (
+        <Sheet
+          open={commentsOpen}
+          onOpenChange={(o) => {
+            if (!o) setCommentsOpenFor(null);
+          }}
+        >
+          <SheetContent side="bottom" className="h-[80vh] overflow-y-auto p-0">
+            <SheetHeader className="px-4 py-3 border-b border-border sticky top-0 bg-background z-10">
+              <SheetTitle className="text-left">Comments</SheetTitle>
+            </SheetHeader>
+            <div className="px-4 pb-8">
+              {commentsOpenFor && <Comments videoId={commentsOpenFor} />}
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
     </div>
   );
 };
