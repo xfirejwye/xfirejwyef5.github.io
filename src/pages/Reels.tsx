@@ -372,6 +372,8 @@ const Reels = () => {
 
                       {/* Right-side action buttons */}
                       <div className="absolute right-2 md:right-3 bottom-24 flex flex-col items-center gap-5 text-white">
+                        <ReelLikeButton videoId={r.id} />
+
                         <button
                           onClick={() => setCommentsOpenFor(r.id)}
                           className="flex flex-col items-center group"
