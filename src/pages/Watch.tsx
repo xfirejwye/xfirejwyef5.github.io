@@ -116,7 +116,7 @@ const Watch = () => {
   const videoUrl = supabase.storage.from("videos").getPublicUrl(video.storage_path).data.publicUrl;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Header />
       <main className="container py-6 md:py-10">
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
