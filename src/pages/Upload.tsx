@@ -180,7 +180,7 @@ const Upload = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Header />
       <main className="container max-w-2xl py-10 md:py-14">
         <h1 className="font-display text-4xl md:text-5xl tracking-wider">

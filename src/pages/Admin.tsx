@@ -60,7 +60,7 @@ const Admin = () => {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
         <Header />
         <div className="grid place-items-center py-32 text-muted-foreground">
           <Loader2 className="h-6 w-6 animate-spin" />
@@ -71,7 +71,7 @@ const Admin = () => {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
         <Header />
         <main className="container max-w-md py-20 text-center">
           <ShieldAlert className="mx-auto h-12 w-12 text-destructive" />
@@ -90,7 +90,7 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Header />
       <main className="container py-10">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-6">

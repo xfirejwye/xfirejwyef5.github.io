@@ -205,7 +205,7 @@ const Reels = () => {
             </Button>
           </div>
         ) : (
-          <div className="flex h-[calc(100vh-4rem)]">
+          <div className="flex h-[calc(100dvh-4rem-3.5rem)] md:h-[calc(100vh-4rem)]">
             {/* ── Feed ── */}
             <div
               ref={containerRef}
@@ -225,7 +225,7 @@ const Reels = () => {
                       if (el) itemRefs.current.set(r.id, el);
                       else itemRefs.current.delete(r.id);
                     }}
-                    className="snap-start h-[calc(100vh-4rem)] w-full grid place-items-center relative"
+                    className="snap-start h-[calc(100dvh-4rem-3.5rem)] md:h-[calc(100vh-4rem)] w-full grid place-items-center relative"
                   >
                     <div className="relative h-full w-full md:max-w-[420px] md:mx-auto bg-black">
                       <video
