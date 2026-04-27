@@ -152,29 +152,31 @@ const Index = () => {
           <div>
             <p>© F5 Videos · Content uploaded by users</p>
 
-          <p className="text-xs mt-1">
-  Made by{" "}
-  
-    href="https://discord.com/users/1116706267390550089"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent font-semibold hover:opacity-80 transition"
-  >
-    xfirejwye
-  </a>{" "}
-  the goat
-</p>
-<p className="text-xs mt-1">
-  
-    href="https://discord.com/users/1159616738405650462"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="bg-gradient-to-r from-white to-neutral-500 bg-clip-text text-transparent font-semibold hover:opacity-80 transition"
-  >
-    am5
-  </a>{" "}
-  is the goat
-</p>
+            <p className="text-xs mt-1">
+              Made by{" "}
+              <a
+                href="https://discord.com/users/1116706267390550089"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent font-semibold hover:opacity-80 transition"
+              >
+                xfirejwye
+              </a>{" "}
+              the goat
+            </p>
+
+            <p className="text-xs mt-1">
+              <a
+                href="https://discord.com/users/1159616738405650462"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-white to-neutral-500 bg-clip-text text-transparent font-semibold hover:opacity-80 transition"
+              >
+                am5
+              </a>{" "}
+              is the goat
+            </p>
+          </div>
 
           <div className="flex flex-col sm:items-end gap-1 text-xs">
             <Link
